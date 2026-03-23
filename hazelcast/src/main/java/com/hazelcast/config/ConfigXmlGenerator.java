@@ -521,20 +521,15 @@ public class ConfigXmlGenerator {
         }
         gen.node("check-class-def-errors", c.isCheckClassDefErrors());
         JavaSerializationFilterConfig javaSerializationFilterConfig = c.getJavaSerializationFilterConfig();
-        if (javaSerializationFilterConfig != null) {
-            gen.open("java-serialization-filter", "defaults-disabled", javaSerializationFilterConfig.isDefaultsDisabled());
-            appendFilterList(gen, "blacklist", javaSerializationFilterConfig.getBlacklist());
-            appendFilterList(gen, "whitelist", javaSerializationFilterConfig.getWhitelist());
-            gen.close();
-        }
-
+        ConfigXmlGeneratorHelper.appendClassFilter(gen, "java-serialization-filter", javaSerializationFilterConfig);
         ConfigXmlGeneratorHelper.compactSerialization(gen, c.getCompactSerializationConfig());
 
         // close serialization
         gen.close();
     }
 
-    private static String classNameOrClass(String className, Class clazz) {
+
+    private static String classNameOrClass(String className, Class<?> clazz) {
         return !isNullOrEmpty(className) ? className
                 : clazz != null ? clazz.getName()
                 : null;
@@ -1048,8 +1043,9 @@ public class ConfigXmlGenerator {
         SqlConfig sqlConfig = config.getSqlConfig();
         gen.open("sql")
                 .node("statement-timeout-millis", sqlConfig.getStatementTimeoutMillis())
-                .node("catalog-persistence-enabled", sqlConfig.isCatalogPersistenceEnabled())
-                .close();
+                .node("catalog-persistence-enabled", sqlConfig.isCatalogPersistenceEnabled());
+        ConfigXmlGeneratorHelper.appendClassFilter(gen, "java-reflection-filter", filterConfig);
+        gen.close();
     }
 
     private static void jetConfig(XmlGenerator gen, Config config) {
@@ -1194,23 +1190,6 @@ public class ConfigXmlGenerator {
         }
     }
 
-    private static void appendFilterList(XmlGenerator gen, String listName, ClassFilter classFilterList) {
-        if (classFilterList.isEmpty()) {
-            return;
-        }
-        gen.open(listName);
-        for (String className : classFilterList.getClasses()) {
-            gen.node("class", className);
-        }
-        for (String packageName : classFilterList.getPackages()) {
-            gen.node("package", packageName);
-        }
-        for (String prefix : classFilterList.getPrefixes()) {
-            gen.node("prefix", prefix);
-        }
-        gen.close();
-    }
-
     private static void integrityCheckerXmlGenerator(final XmlGenerator gen, final Config config) {
         gen.node(
                 "integrity-checker",
@@ -1239,6 +1218,94 @@ public class ConfigXmlGenerator {
         gen.open("tpc", "enabled", tpcConfig.isEnabled())
                 .node("eventloop-count", tpcConfig.getEventloopCount())
                 .close();
+    }
+
+    public static void namespacesConfiguration(XmlGenerator gen, Config config) {
+        UserCodeNamespacesConfig userCodeNamespacesConfig = config.getNamespacesConfig();
+        if (userCodeNamespacesConfig == null) {
+            return;
+        }
+        gen.open("user-code-namespaces", "enabled", userCodeNamespacesConfig.isEnabled());
+        JavaSerializationFilterConfig filterConfig = userCodeNamespacesConfig.getClassFilterConfig();
+        ConfigXmlGeneratorHelper.appendClassFilter(gen, "class-filter", filterConfig);
+        namespaceConfigurations(gen, config);
+        gen.close();
+    }
+
+
+    private void restServerConfiguration(final XmlGenerator gen, final Config config) {
+        RestConfig restConfig = config.getRestConfig();
+        gen.open("rest", "enabled", restConfig.isEnabled())
+                .node("port", restConfig.getPort())
+                .node("security-realm", restConfig.getSecurityRealm())
+                .node("token-validity-seconds", restConfig.getTokenValidityDuration().toSeconds())
+                .node("request-timeout-seconds", restConfig.getRequestTimeoutDuration().toSeconds())
+                .node("max-login-attempts", restConfig.getMaxLoginAttempts())
+                .node("lockout-duration-seconds", restConfig.getLockoutDuration().toSeconds());
+        restServerSslConfiguration(gen, restConfig.getSsl());
+        gen.close();
+    }
+
+    private void restServerSslConfiguration(XmlGenerator gen, RestConfig.Ssl ssl) {
+        gen.open("ssl", "enabled", ssl.isEnabled())
+                .node("client-auth", ssl.getClientAuth().name())
+                .node("ciphers", ssl.getCiphers())
+                .node("enabled-protocols", ssl.getEnabledProtocols())
+                .node("key-alias", ssl.getKeyAlias())
+                .node("key-password", getOrMaskValue(ssl.getKeyPassword()))
+                .node("key-store", ssl.getKeyStore())
+                .node("key-store-password", getOrMaskValue(ssl.getKeyStorePassword()))
+                .node("key-store-type", ssl.getKeyStoreType())
+                .node("key-store-provider", ssl.getKeyStoreProvider())
+                .node("trust-store", ssl.getTrustStore())
+                .node("trust-store-password", getOrMaskValue(ssl.getTrustStorePassword()))
+                .node("trust-store-type", ssl.getTrustStoreType())
+                .node("trust-store-provider", ssl.getTrustStoreProvider())
+                .node("protocol", ssl.getProtocol())
+                .node("certificate", ssl.getCertificate())
+                .node("certificate-key", ssl.getCertificatePrivateKey())
+                .node("trust-certificate", ssl.getTrustCertificate())
+                .node("trust-certificate-key", ssl.getTrustCertificatePrivateKey())
+                .close();
+    }
+
+    private void memberAttributesXmlGenerator(XmlGenerator gen, Config config) {
+        MemberAttributeConfig memberAttributeConfig = config.getMemberAttributeConfig();
+        if (!memberAttributeConfig.getAttributes().isEmpty()) {
+            gen.open("member-attributes");
+            for (Map.Entry<String, String> attribute : memberAttributeConfig.getAttributes().entrySet()) {
+                gen.node("attribute", attribute.getValue(), "name", attribute.getKey());
+            }
+            gen.close();
+        }
+    }
+
+    public static void namespaceConfigurations(XmlGenerator gen, Config config) {
+        Map<String, UserCodeNamespaceConfig> namespaces = config.getNamespacesConfig().getNamespaceConfigs();
+        for (Map.Entry<String, UserCodeNamespaceConfig> entry : namespaces.entrySet()) {
+            UserCodeNamespaceConfig userCodeNamespaceConfig = entry.getValue();
+            gen.open("namespace", "name", entry.getKey());
+            Collection<ResourceDefinition> resourceDefinition =  userCodeNamespaceConfig.getResourceConfigs();
+            resourceDefinition.forEach(resource -> {
+                String resourceId = resource.id();
+                gen.open(translateResourceType(resource.type()), "id", resourceId);
+                gen.node("url", resource.url());
+                gen.close();
+            });
+            gen.close();
+        }
+    }
+
+    private static String translateResourceType(ResourceType type) {
+        if (ResourceType.JAR == type) {
+            return "jar";
+        } else if (ResourceType.JARS_IN_ZIP == type) {
+            return "jars-in-zip";
+        } else if (ResourceType.CLASS == type) {
+            return "class";
+        } else {
+            throw new IllegalArgumentException("Unknown resource type: " + type);
+        }
     }
 
     /**

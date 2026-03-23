@@ -263,21 +263,21 @@ public class CompactSerializationTest {
         // OptionalDouble is a class that does not implement the Serializable interface
         // from the java.util package, which is not allowed to be serialized
         // by zero-config serializer.
-        assertThatThrownBy(() -> {
-            service.toData(OptionalDouble.of(1));
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("If you want to serialize this class");
+        assertThatThrownBy(() ->
+                service.toData(OptionalDouble.of(1))
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("To override an existing serialization mechanism you can add");
     }
 
     @Test
     public void testSerializingClassReflectively_withUnsupportedFieldType() {
         SerializationService service = createSerializationService(new SerializationConfig());
-        assertThatThrownBy(() -> {
-            service.toData(new ClassWithUnsupportedField());
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("which uses this class in its fields");
+        assertThatThrownBy(() ->
+                service.toData(new ClassWithUnsupportedField())
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("because it has a field of type 'java.util.LinkedList'");
     }
 
     @Test
@@ -303,31 +303,31 @@ public class CompactSerializationTest {
     @Test
     public void testSerializingClassReflectively_withUnsupportedArrayItemType() {
         SerializationService service = createSerializationService(new SerializationConfig());
-        assertThatThrownBy(() -> {
-            service.toData(new ClassWithUnsupportedArrayField());
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("which uses this class in its fields");
+        assertThatThrownBy(() ->
+                service.toData(new ClassWithUnsupportedArrayField())
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("because it has a field of type 'java.util.LinkedList'");
     }
 
     @Test
     public void testSerializingClassReflectively_withArrayOfArrayField() {
         SerializationService service = createSerializationService(new SerializationConfig());
-        assertThatThrownBy(() -> {
-                service.toData(new ClassWithArrayOfArrayField());
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("which uses this class in its fields");
+        assertThatThrownBy(() ->
+                service.toData(new ClassWithArrayOfArrayField())
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("because it has a field of type '[I'");
     }
 
     @Test
     public void testSerializingClassReflectively_withVoidField() {
         SerializationService service = createSerializationService(new SerializationConfig());
-        assertThatThrownBy(() -> {
-            service.toData(new ClassWithVoidField());
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("which uses this class in its fields");
+        assertThatThrownBy(() ->
+                service.toData(new ClassWithVoidField())
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("because it has a field of type 'java.lang.Void'");
     }
 
     @Test
@@ -368,26 +368,22 @@ public class CompactSerializationTest {
         SerializationConfig config = new SerializationConfig();
         SerializationService service = createSerializationService(config);
 
-        assertThatThrownBy(() -> {
-            service.toData(new ClassWithUnsupportedArrayListField());
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("UUID")
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("which uses this class in its fields");
+        assertThatThrownBy(() ->
+                service.toData(new ClassWithUnsupportedArrayListField())
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("because it has a field of type 'java.util.UUID'");
 
-        assertThatThrownBy(() -> {
-            service.toData(new ClassWithUnsupportedHashSetField());
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("UUID")
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("which uses this class in its fields");
+        assertThatThrownBy(() ->
+                service.toData(new ClassWithUnsupportedHashSetField())
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("because it has a field of type 'java.util.UUID'");
 
-        assertThatThrownBy(() -> {
-            service.toData(new ClassWithUnsupportedHashMapField());
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("UUID")
+        assertThatThrownBy(() -> service.toData(new ClassWithUnsupportedHashMapField()))
+                .isInstanceOf(HazelcastSerializationException.class)
                 .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("which uses this class in its fields");
+                .hasStackTraceContaining("because it has a field of type 'java.util.UUID'");
     }
 
     @Test
@@ -435,11 +431,11 @@ public class CompactSerializationTest {
         SerializationConfig config = new SerializationConfig();
         SerializationService service = createSerializationService(config);
 
-        assertThatThrownBy(() -> {
-            service.toData(new UsesSerializableClassAsField(new SerializableEmployeeDTO("John Doe", 42)));
-        }).isInstanceOf(HazelcastSerializationException.class)
-                .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
-                .hasStackTraceContaining("can be serialized with another serialization mechanism.");
+        assertThatThrownBy(() ->
+                service.toData(new UsesSerializableClassAsField(new SerializableEmployeeDTO("John Doe", 42)))
+        ).isInstanceOf(HazelcastSerializationException.class)
+         .hasStackTraceContaining("cannot be serialized with zero configuration Compact serialization")
+         .hasStackTraceContaining("can be serialized with another serialization mechanism");
     }
 
     @Test

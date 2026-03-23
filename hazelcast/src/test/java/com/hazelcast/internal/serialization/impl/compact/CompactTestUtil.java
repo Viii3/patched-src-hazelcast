@@ -17,12 +17,14 @@
 package com.hazelcast.internal.serialization.impl.compact;
 
 import com.hazelcast.config.CompactSerializationConfig;
+import com.hazelcast.config.JavaSerializationFilterConfig;
 import com.hazelcast.config.SerializationConfig;
 import com.hazelcast.core.HazelcastInstance;
 import com.hazelcast.internal.serialization.Data;
 import com.hazelcast.internal.serialization.InternalSerializationService;
 import com.hazelcast.internal.serialization.SerializationService;
 import com.hazelcast.internal.serialization.impl.DefaultSerializationServiceBuilder;
+import com.hazelcast.internal.serialization.impl.ExtraReflectiveCompactSerializationRestrictions;
 import com.hazelcast.nio.serialization.compact.CompactSerializer;
 import com.hazelcast.nio.serialization.genericrecord.GenericRecord;
 import com.hazelcast.nio.serialization.genericrecord.GenericRecordBuilder;
@@ -34,6 +36,7 @@ import example.serialization.MainDTO;
 import example.serialization.NamedDTO;
 import example.serialization.AllFieldsDTO;
 import example.serialization.SerializableEmployeeDTO;
+import org.assertj.core.api.Assertions;
 
 import javax.annotation.Nonnull;
 import java.math.BigDecimal;
@@ -349,20 +352,32 @@ public final class CompactTestUtil {
      * Can only return the schemas for classes that are serialized with
      * reflective serializer.
      */
-    public static Collection<Schema> getSchemasFor(Class<?>... classes) {
-        CompactStreamSerializer compactStreamSerializer = mock(CompactStreamSerializer.class);
-        when(compactStreamSerializer.canBeSerializedAsCompact(any())).thenReturn(true);
+    public static Iterable<Schema> getSchemasFor(Class<?>... classes) {
+        CompactStreamSerializer compactStreamSerializer = new CompactStreamSerializer(null, new CompactSerializationConfig(),
+                null, null, null, ExtraReflectiveCompactSerializationRestrictions.NO_RESTRICTIONS) {
+                    @Override
+                    public boolean canBeSerializedAsCompact(Class<?> clazz) {
+                        return true;
+                    }
+                };
         ReflectiveCompactSerializer serializer = new ReflectiveCompactSerializer(compactStreamSerializer);
-        ArrayList<Schema> schemas = new ArrayList<>(classes.length);
-        for (Class<?> clazz : classes) {
-            SchemaWriter writer = new SchemaWriter(clazz.getName());
-            try {
-                serializer.write(writer, clazz.getDeclaredConstructor().newInstance());
-            } catch (Throwable t) {
-                throw new RuntimeException(t);
-            }
-            schemas.add(writer.build());
-        }
-        return schemas;
+
+        return Arrays.stream(classes)
+                     .map(clazz -> {
+                         SchemaWriter writer = new SchemaWriter(clazz.getName());
+
+                         try {
+                             serializer.write(writer, clazz.getDeclaredConstructor()
+                                                           .newInstance());
+                         } catch (Throwable t) {
+                             throw new RuntimeException(t);
+                         }
+
+                         return writer.build();
+                     })::iterator;
+    }
+
+    public static void assertZeroConfigFilter(SerializationConfig actual, JavaSerializationFilterConfig expected) {
+        Assertions.assertThat(actual.getCompactSerializationConfig().getZeroConfigFilter()).isEqualTo(expected);
     }
 }

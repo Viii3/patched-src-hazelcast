@@ -195,6 +195,8 @@ public abstract class AbstractDomConfigProcessor implements DomConfigProcessor {
                 fillCompactSerializers(child, compactSerializationConfig);
             } else if (matches("classes", name)) {
                 fillCompactSerializableClasses(child, compactSerializationConfig);
+            } else if (matches("zero-config-filter", name)) {
+                fillJavaSerializationFilter(child, compactSerializationConfig);
             }
         }
     }
@@ -274,6 +276,18 @@ public abstract class AbstractDomConfigProcessor implements DomConfigProcessor {
     }
 
     protected void fillJavaSerializationFilter(final Node node, SerializationConfig serializationConfig) {
+        serializationConfig.setJavaSerializationFilterConfig(getJavaFilter(node));
+    }
+
+    protected void fillJavaSerializationFilter(final Node node, UserCodeNamespacesConfig userCodeNamespacesConfig) {
+        userCodeNamespacesConfig.setClassFilterConfig(getJavaFilter(node));
+    }
+
+    protected void fillJavaSerializationFilter(final Node node, CompactSerializationConfig compactSerializationConfig) {
+        compactSerializationConfig.setZeroConfigFilter(getJavaFilter(node));
+    }
+
+    JavaSerializationFilterConfig getJavaFilter(final Node node) {
         JavaSerializationFilterConfig filterConfig = new JavaSerializationFilterConfig();
         serializationConfig.setJavaSerializationFilterConfig(filterConfig);
         Node defaultsDisabledNode = getNamedItemNode(node, "defaults-disabled");

@@ -17,8 +17,8 @@
 package com.hazelcast.internal.serialization.impl.compact.record;
 
 import com.hazelcast.internal.serialization.impl.compact.CompactStreamSerializer;
-import com.hazelcast.internal.serialization.impl.compact.CompactUtil;
 import com.hazelcast.internal.serialization.impl.compact.DefaultCompactReader;
+import com.hazelcast.internal.serialization.impl.compact.ReflectiveCompactSerializationUnsupportedException;
 import com.hazelcast.internal.serialization.impl.compact.Schema;
 import com.hazelcast.internal.serialization.impl.compact.zeroconfig.ValueReaderWriter;
 import com.hazelcast.internal.serialization.impl.compact.zeroconfig.ValueReaderWriters;
@@ -137,9 +137,6 @@ public class JavaRecordSerializer implements CompactSerializer<Object> {
     }
 
     private void populateReadersWriters(Class<?> clazz) {
-        // The top level class might not be Compact serializable
-        CompactUtil.verifyClassIsCompactSerializable(clazz);
-
         try {
             Object[] recordComponents = (Object[]) getRecordComponentsMethod.invoke(clazz);
             Class<?>[] componentTypes = new Class<?>[recordComponents.length];
@@ -167,6 +164,8 @@ public class JavaRecordSerializer implements CompactSerializer<Object> {
             JavaRecordReader recordReader = new JavaRecordReader(constructor, componentReaderWriters);
             readersCache.put(clazz, recordReader);
             readerWritersCache.put(clazz, componentReaderWriters);
+        } catch (ReflectiveCompactSerializationUnsupportedException e) {
+            throw e;
         } catch (Exception e) {
             throw new HazelcastSerializationException("Failed to construct the readers/writers for the Java record", e);
         }
