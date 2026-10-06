@@ -27,7 +27,7 @@
     <parent>
         <groupId>com.hazelcast</groupId>
         <artifactId>hazelcast-root</artifactId>
-        <version>3.12.13-payara-2</version>
+        <version>3.12.13-payara-3-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
