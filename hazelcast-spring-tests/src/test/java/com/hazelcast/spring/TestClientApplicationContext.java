@@ -63,6 +63,10 @@ import com.hazelcast.config.security.JaasAuthenticationConfig;
 import com.hazelcast.config.security.RealmConfig;
 import com.hazelcast.core.Hazelcast;
 import com.hazelcast.core.HazelcastInstance;
+import com.hazelcast.cp.IAtomicLong;
+import com.hazelcast.cp.IAtomicReference;
+import com.hazelcast.cp.ICountDownLatch;
+import com.hazelcast.cp.ISemaphore;
 import com.hazelcast.internal.serialization.impl.compact.CompactTestUtil;
 import com.hazelcast.map.IMap;
 import com.hazelcast.memory.MemoryUnit;
@@ -392,7 +396,7 @@ public class TestClientApplicationContext {
     }
 
     @Test
-    void tesCompactSerializationConfig() {
+    public void tesCompactSerializationConfig() {
         SerializationConfig serializationConfig = clientWithCompactSerialization.getClientConfig().getSerializationConfig();
         CompactSerializationConfig compactSerializationConfig = serializationConfig.getCompactSerializationConfig();
 

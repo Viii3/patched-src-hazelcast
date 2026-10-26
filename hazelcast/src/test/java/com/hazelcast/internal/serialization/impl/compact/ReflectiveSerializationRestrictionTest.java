@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2026, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.junit.runners.Parameterized.Parameter;
 import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
+import java.util.Arrays;
 import java.util.List;
 
 @RunWith(HazelcastParametrizedRunner.class)
@@ -65,10 +66,10 @@ public class ReflectiveSerializationRestrictionTest
     public static List<Object[]> parameters() {
         Class<?> clazz = RestrictionTestDto.class;
         String name = clazz.getName();
-        String pkg = clazz.getPackageName();
-        String prefix = clazz.getPackageName() + ".";
+        String pkg = clazz.getPackage().getName();
+        String prefix = pkg + ".";
         RestrictionTestDto obj = new RestrictionTestDto(5);
-        return List.of(
+        return Arrays.asList(
                 new Object[]{obj, true, filter(false, null, null)},
                 new Object[]{obj, true, filter(true, null, null)},
                 new Object[]{obj, true, filter(false, null, new ClassFilter())},

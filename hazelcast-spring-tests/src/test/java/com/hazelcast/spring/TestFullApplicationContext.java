@@ -138,6 +138,7 @@ import com.hazelcast.cp.ISemaphore;
 import com.hazelcast.cp.lock.FencedLock;
 import com.hazelcast.crdt.pncounter.PNCounter;
 import com.hazelcast.flakeidgen.FlakeIdGenerator;
+import com.hazelcast.instance.impl.HazelcastInstanceFactory;
 import com.hazelcast.internal.serialization.impl.compact.CompactTestUtil;
 import com.hazelcast.jet.JetService;
 import com.hazelcast.jet.config.EdgeConfig;

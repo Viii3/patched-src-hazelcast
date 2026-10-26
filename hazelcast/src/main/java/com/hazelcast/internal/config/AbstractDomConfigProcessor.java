@@ -279,17 +279,12 @@ public abstract class AbstractDomConfigProcessor implements DomConfigProcessor {
         serializationConfig.setJavaSerializationFilterConfig(getJavaFilter(node));
     }
 
-    protected void fillJavaSerializationFilter(final Node node, UserCodeNamespacesConfig userCodeNamespacesConfig) {
-        userCodeNamespacesConfig.setClassFilterConfig(getJavaFilter(node));
-    }
-
     protected void fillJavaSerializationFilter(final Node node, CompactSerializationConfig compactSerializationConfig) {
         compactSerializationConfig.setZeroConfigFilter(getJavaFilter(node));
     }
 
     JavaSerializationFilterConfig getJavaFilter(final Node node) {
         JavaSerializationFilterConfig filterConfig = new JavaSerializationFilterConfig();
-        serializationConfig.setJavaSerializationFilterConfig(filterConfig);
         Node defaultsDisabledNode = getNamedItemNode(node, "defaults-disabled");
         boolean defaultsDisabled = defaultsDisabledNode != null && getBooleanValue(getTextContent(defaultsDisabledNode));
         filterConfig.setDefaultsDisabled(defaultsDisabled);
@@ -303,6 +298,7 @@ public abstract class AbstractDomConfigProcessor implements DomConfigProcessor {
                 filterConfig.setWhitelist(list);
             }
         }
+        return filterConfig;
     }
 
     protected ClassFilter parseClassFilterList(Node node) {

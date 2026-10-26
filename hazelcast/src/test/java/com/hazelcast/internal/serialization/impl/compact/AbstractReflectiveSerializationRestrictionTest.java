@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2026, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -102,8 +102,8 @@ public abstract class AbstractReflectiveSerializationRestrictionTest {
     }
 
     private InternalSerializationService getActualSerializationService(HazelcastInstance hz) {
-        if (hz instanceof HazelcastClientProxy proxy) {
-            return proxy.getSerializationService();
+        if (hz instanceof HazelcastClientProxy) {
+            return ((HazelcastClientProxy) hz).getSerializationService();
         } else {
             return Accessors.getSerializationService(hz);
         }
@@ -115,8 +115,9 @@ public abstract class AbstractReflectiveSerializationRestrictionTest {
                 hz.getConfig().getSerializationConfig().getCompactSerializationConfig());
         config.setZeroConfigFilter(new JavaSerializationFilterConfig());
 
-        SchemaService schemaService = hz instanceof HazelcastClientProxy clientProxy ? clientProxy.client.getSchemaService() : Accessors.getNode(
-                hz).getSchemaService();
+        SchemaService schemaService = hz instanceof HazelcastClientProxy
+                ? ((HazelcastClientProxy) hz).client.getSchemaService()
+                : Accessors.getNode(hz).getSchemaService();
 
         CompactStreamSerializerAdapter adjustedAdapter = new CompactStreamSerializerAdapter(
                 new CompactStreamSerializer(cls -> CompactStreamSerializerAdapter.class, config, ss.getManagedContext(),

@@ -63,7 +63,7 @@ public class CompactStreamSerializer implements StreamSerializer<Object> {
     private final Map<Class, CompactSerializableRegistration> classToRegistrationMap = new ConcurrentHashMap<>();
     private final Map<String, CompactSerializableRegistration> typeNameToRegistrationMap = new ConcurrentHashMap<>();
     private final Map<Class, Schema> classToSchemaMap = new ConcurrentHashMap<>();
-    private final ReflectiveCompactSerializer reflectiveSerializer = new ReflectiveCompactSerializer(this);
+    private final ReflectiveCompactSerializer reflectiveSerializer;
     private final JavaRecordSerializer javaRecordSerializer = new JavaRecordSerializer(this);
     private final SchemaService schemaService;
     private final ManagedContext managedContext;

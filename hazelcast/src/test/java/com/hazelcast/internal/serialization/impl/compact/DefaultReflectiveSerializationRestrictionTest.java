@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2026, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ import org.junit.runners.Parameterized.Parameters;
 import org.junit.runners.Parameterized.UseParametersRunnerFactory;
 
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @RunWith(HazelcastParametrizedRunner.class)
@@ -47,6 +48,6 @@ public class DefaultReflectiveSerializationRestrictionTest
     @Parameters(name = "{index} class={1}")
     public static List<Object[]> parameters() {
         return Stream.of(new HeapData(new byte[12]), new Packet(new byte[12], 10))
-                     .map(e -> new Object[]{e, e.getClass().getSimpleName()}).toList();
+                     .map(e -> new Object[]{e, e.getClass().getSimpleName()}).collect(Collectors.toList());
     }
 }

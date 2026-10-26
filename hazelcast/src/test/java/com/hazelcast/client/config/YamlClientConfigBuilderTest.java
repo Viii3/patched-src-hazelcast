@@ -839,26 +839,26 @@ public class YamlClientConfigBuilderTest extends AbstractClientConfigBuilderTest
 
     @Override
     public void testCompactSerialization_zeroConfigRestrictions() {
-        String yaml = """
-                hazelcast-client:
-                  serialization:
-                    compact-serialization:
-                      zero-config-filter:
-                        whitelist:
-                          class:
-                          - com.acme.MyClass
-                          package:
-                          - com.acme.package
-                          prefix:
-                          - com.acme.prefix.
-                        blacklist:
-                          class:
-                          - com.acme.MyClass2
-                          package:
-                          - com.acme.package2
-                          prefix:
-                          - com.acme.prefix2.
-                """;
+        String yaml =
+                "hazelcast-client:\n"
+                + "  serialization:\n"
+                + "    compact-serialization:\n"
+                + "      zero-config-filter:\n"
+                + "        whitelist:\n"
+                + "          class:\n"
+                + "          - com.acme.MyClass\n"
+                + "          package:\n"
+                + "          - com.acme.package\n"
+                + "          prefix:\n"
+                + "          - com.acme.prefix.\n"
+                + "        blacklist:\n"
+                + "          class:\n"
+                + "          - com.acme.MyClass2\n"
+                + "          package:\n"
+                + "          - com.acme.package2\n"
+                + "          prefix:\n"
+                + "          - com.acme.prefix2.\n"
+                ;
 
         SerializationConfig config = buildConfig(yaml).getSerializationConfig();
         CompactTestUtil.verifySerializationServiceBuilds(config);
@@ -872,13 +872,13 @@ public class YamlClientConfigBuilderTest extends AbstractClientConfigBuilderTest
 
     @Override
     public void testCompactSerialization_zeroConfigDefaultsDisabled() {
-        String yaml = """
-                hazelcast-client:
-                  serialization:
-                    compact-serialization:
-                      zero-config-filter:
-                        defaults-disabled: true
-                """;
+        String yaml =
+                "hazelcast-client:\n"
+                + "  serialization:\n"
+                + "    compact-serialization:\n"
+                + "      zero-config-filter:\n"
+                + "        defaults-disabled: true\n"
+                ;
 
         SerializationConfig config = buildConfig(yaml).getSerializationConfig();
         CompactTestUtil.verifySerializationServiceBuilds(config);

@@ -1500,6 +1500,37 @@
         </xs:complexType>
     </xs:element>
 
+    <xs:complexType name="class-filter">
+        <xs:sequence>
+            <xs:element name="blacklist" type="filter-list" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        Class names, package names, and prefixes, which are rejected by the filter.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+            <xs:element name="whitelist" type="filter-list" minOccurs="0">
+                <xs:annotation>
+                    <xs:documentation>
+                        Class names, package names, and prefixes, which are allowed by the filter.
+
+                        If the list is empty (no class, package, or prefix patterns provided) then all classes are allowed.
+                    </xs:documentation>
+                </xs:annotation>
+            </xs:element>
+        </xs:sequence>
+        <xs:attribute name="defaults-disabled" default="false">
+            <xs:annotation>
+                <xs:documentation>
+                    Disables including default list entries (hardcoded in Hazelcast source code).
+                </xs:documentation>
+            </xs:annotation>
+            <xs:simpleType>
+                <xs:restriction base="xs:boolean"/>
+            </xs:simpleType>
+        </xs:attribute>
+    </xs:complexType>
+
     <xs:complexType name="filter-list">
         <xs:choice minOccurs="0" maxOccurs="unbounded">
             <xs:element name="class" type="xs:string" minOccurs="0" maxOccurs="unbounded">
@@ -1551,6 +1582,7 @@
             <xs:all>
                 <xs:element name="serializers" type="compact-serializers" minOccurs="0"/>
                 <xs:element name="classes" type="compact-serializable-classes" minOccurs="0"/>
+                <xs:element name="zero-config-filter" type="class-filter" minOccurs="0"/>
             </xs:all>
         </xs:complexType>
     </xs:element>

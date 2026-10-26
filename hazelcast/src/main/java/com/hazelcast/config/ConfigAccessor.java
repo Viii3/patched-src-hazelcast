@@ -46,30 +46,6 @@ public final class ConfigAccessor {
         return config.getInstanceTrackingConfig().isEnabledSet;
     }
 
-    public static Map<String, UserCodeNamespaceConfig> getNamespaceConfigs(UserCodeNamespacesConfig config) {
-       return config.getNamespaceConfigs();
-    }
-
-    public static void add(UserCodeNamespaceConfig config, @Nonnull ResourceDefinitionHolder holder) {
-        config.add(new ResourceDefinitionImpl(holder));
-    }
-
-    public static Collection<ResourceDefinition> getResourceDefinitions(UserCodeNamespaceConfig nsConfig) {
-        return nsConfig.getResourceConfigs();
-    }
-
-    /**
-     * Adds Namespace directly to namespaces configuration without
-     * Broadcasting to cluster members.
-     * <p>
-     * @param namespacesConfig The namespaces configuration.
-     * @param namespaceConfig The namespace to add.
-     */
-    public static void addNamespaceConfigLocally(UserCodeNamespacesConfig namespacesConfig,
-                                                 UserCodeNamespaceConfig namespaceConfig) {
-        namespacesConfig.addNamespaceConfigLocally(namespaceConfig);
-    }
-
     public static ClassFilter getWhitelistOrNull(JavaSerializationFilterConfig filter) {
         return filter.getWhitelistOrNull();
     }

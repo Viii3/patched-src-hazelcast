@@ -62,9 +62,6 @@ import static org.hamcrest.Matchers.containsInAnyOrder;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 public final class CompactTestUtil {
 
@@ -352,7 +349,7 @@ public final class CompactTestUtil {
      * Can only return the schemas for classes that are serialized with
      * reflective serializer.
      */
-    public static Iterable<Schema> getSchemasFor(Class<?>... classes) {
+    public static Collection<Schema> getSchemasFor(Class<?>... classes) {
         CompactStreamSerializer compactStreamSerializer = new CompactStreamSerializer(null, new CompactSerializationConfig(),
                 null, null, null, ExtraReflectiveCompactSerializationRestrictions.NO_RESTRICTIONS) {
                     @Override
@@ -361,20 +358,17 @@ public final class CompactTestUtil {
                     }
                 };
         ReflectiveCompactSerializer serializer = new ReflectiveCompactSerializer(compactStreamSerializer);
-
-        return Arrays.stream(classes)
-                     .map(clazz -> {
-                         SchemaWriter writer = new SchemaWriter(clazz.getName());
-
-                         try {
-                             serializer.write(writer, clazz.getDeclaredConstructor()
-                                                           .newInstance());
-                         } catch (Throwable t) {
-                             throw new RuntimeException(t);
-                         }
-
-                         return writer.build();
-                     })::iterator;
+        ArrayList<Schema> schemas = new ArrayList<>(classes.length);
+        for (Class<?> clazz : classes) {
+            SchemaWriter writer = new SchemaWriter(clazz.getName());
+            try {
+                serializer.write(writer, clazz.getDeclaredConstructor().newInstance());
+            } catch (Throwable t) {
+                throw new RuntimeException(t);
+            }
+            schemas.add(writer.build());
+        }
+        return schemas;
     }
 
     public static void assertZeroConfigFilter(SerializationConfig actual, JavaSerializationFilterConfig expected) {

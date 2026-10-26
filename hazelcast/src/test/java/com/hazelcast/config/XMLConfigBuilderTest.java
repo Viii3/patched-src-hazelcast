@@ -3225,24 +3225,24 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
 
     @Override
     public void testCompactSerialization_zeroConfigRestrictions() {
-        String xml = HAZELCAST_START_TAG + """
-                <serialization>
-                    <compact-serialization>
-                        <zero-config-filter>
-                            <whitelist>
-                                <class>com.acme.MyClass</class>
-                                <package>com.acme.package</package>
-                                <prefix>com.acme.prefix.</prefix>
-                            </whitelist>
-                            <blacklist>
-                                <class>com.acme.MyClass2</class>
-                                <package>com.acme.package2</package>
-                                <prefix>com.acme.prefix2.</prefix>
-                            </blacklist>
-                        </zero-config-filter>
-                    </compact-serialization>
-                </serialization>
-                """ + HAZELCAST_END_TAG;
+        String xml = HAZELCAST_START_TAG
+                + "<serialization>\n"
+                + "    <compact-serialization>\n"
+                + "        <zero-config-filter>\n"
+                + "            <whitelist>\n"
+                + "                <class>com.acme.MyClass</class>\n"
+                + "                <package>com.acme.package</package>\n"
+                + "                <prefix>com.acme.prefix.</prefix>\n"
+                + "            </whitelist>\n"
+                + "            <blacklist>\n"
+                + "                <class>com.acme.MyClass2</class>\n"
+                + "                <package>com.acme.package2</package>\n"
+                + "                <prefix>com.acme.prefix2.</prefix>\n"
+                + "            </blacklist>\n"
+                + "        </zero-config-filter>\n"
+                + "    </compact-serialization>\n"
+                + "</serialization>\n"
+                + HAZELCAST_END_TAG;
 
         SerializationConfig config = buildConfig(xml).getSerializationConfig();
         CompactTestUtil.verifySerializationServiceBuilds(config);
@@ -3256,13 +3256,13 @@ public class XMLConfigBuilderTest extends AbstractConfigBuilderTest {
 
     @Override
     public void testCompactSerialization_zeroConfigDefaultsDisabled() {
-        String xml = HAZELCAST_START_TAG + """
-                <serialization>
-                    <compact-serialization>
-                        <zero-config-filter defaults-disabled="true"/>
-                    </compact-serialization>
-                </serialization>
-                """ + HAZELCAST_END_TAG;
+        String xml = HAZELCAST_START_TAG
+                + "<serialization>\n"
+                + "    <compact-serialization>\n"
+                + "        <zero-config-filter defaults-disabled=\"true\"/>\n"
+                + "    </compact-serialization>\n"
+                + "</serialization>\n"
+                + HAZELCAST_END_TAG;
 
         SerializationConfig config = buildConfig(xml).getSerializationConfig();
         CompactTestUtil.verifySerializationServiceBuilds(config);

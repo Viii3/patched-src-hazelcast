@@ -737,7 +737,6 @@ public abstract class AbstractSerializationService implements InternalSerializat
         private SchemaService schemaService;
         private ExtraReflectiveCompactSerializationRestrictions reflectiveCompactSerializationRestrictions
                 = ExtraReflectiveCompactSerializationRestrictions.NO_RESTRICTIONS;
-        private HazelcastProperties hazelcastProperties;
 
         protected Builder() {
         }
@@ -829,11 +828,6 @@ public abstract class AbstractSerializationService implements InternalSerializat
         public final T withReflectiveCompactSerializationRestrictions(
                 @Nonnull ExtraReflectiveCompactSerializationRestrictions restrictions) {
             this.reflectiveCompactSerializationRestrictions = Objects.requireNonNull(restrictions);
-            return self();
-        }
-
-        public final T withProperties(HazelcastProperties properties) {
-            this.hazelcastProperties = properties;
             return self();
         }
     }

@@ -311,7 +311,6 @@ public class DefaultSerializationServiceBuilder implements SerializationServiceB
                     .withReflectiveCompactSerializationRestrictions(new ExtraReflectiveCompactSerializationRestrictions(
                            null, null, createReflectiveCompactSerializerDefaultBlockList()
                     ))
-                    .withProperties(properties)
                     .build();
                 serializationServiceV1.registerClassDefinitions(classDefinitions);
                 return serializationServiceV1;

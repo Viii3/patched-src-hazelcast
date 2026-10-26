@@ -3319,6 +3319,23 @@
                   }
                 }
               }
+            },
+            "zero-config-filter": {
+              "type": "object",
+              "additionalProperties": false,
+              "description": "Configure blacklisting and whitelisting for restricting zero-config compact serialization.",
+              "properties": {
+                "defaults-disabled": {
+                  "type": "boolean",
+                  "default": false
+                },
+                "whitelist": {
+                  "$ref": "#/definitions/ClassFilter"
+                },
+                "blacklist": {
+                  "$ref": "#/definitions/ClassFilter"
+                }
+              }
             }
           }
         }

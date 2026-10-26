@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2008-2026, Hazelcast, Inc. All Rights Reserved.
+ * Copyright (c) 2008-2023, Hazelcast, Inc. All Rights Reserved.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,10 +35,10 @@ import org.junit.Test;
 import org.junit.experimental.categories.Category;
 import org.junit.runner.RunWith;
 
+import java.util.AbstractMap.SimpleImmutableEntry;
 import java.util.Map;
 import java.util.Objects;
 
-import static java.util.Map.entry;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
@@ -90,19 +90,14 @@ public class NestedReflectiveRestrictionTest {
     @Test
     public void testClientWritingRestrictedImplementationAndMemberReading() {
         testClientWritingRestrictedImplementationAndMemberReadingImpl(
-                entry(new TestDto(new IntWrapper(6), "xyz"), intWrapperGenericRecord(TestDto.class, "xyz", 6)),
+                new SimpleImmutableEntry<>(new TestDto(new IntWrapper(6), "xyz"),
+                        intWrapperGenericRecord(TestDto.class, "xyz", 6)),
                 new TestDto(new LongWrapper(7), "abc"));
     }
 
-    @Test
-    public void testClientWritingRestrictedImplementationAndMemberReadingRecord() {
-        testClientWritingRestrictedImplementationAndMemberReadingImpl(
-                entry(new TestRecordDto(new IntWrapper(6), "xyz"), intWrapperGenericRecord(TestRecordDto.class, "xyz", 6)),
-                new TestRecordDto(new LongWrapper(7), "abc"));
-    }
-
-    private <T> void testClientWritingRestrictedImplementationAndMemberReadingImpl(Map.Entry<T, GenericRecord> restrictedPair,
-                                                                                   T unrestrictedObject) {
+    // Java record variant of this test lives in hazelcast-it/jdk17-tests (NestedReflectiveRecordRestrictionTest)
+    protected <T> void testClientWritingRestrictedImplementationAndMemberReadingImpl(Map.Entry<T, GenericRecord> restrictedPair,
+                                                                                     T unrestrictedObject) {
         IMap<Integer, Object> clientMap = client.getMap("map");
         IMap<Integer, Object> memberMap = member.getMap("map");
 
@@ -124,7 +119,7 @@ public class NestedReflectiveRestrictionTest {
         assertThat(clientMap.get(1)).isEqualTo(restrictedPair.getKey());
     }
 
-    private GenericRecord intWrapperGenericRecord(Class<?> topClazz, String otherField, int n) {
+    protected GenericRecord intWrapperGenericRecord(Class<?> topClazz, String otherField, int n) {
         GenericRecord subRecord = GenericRecordBuilder.compact(IntWrapper.class.getName()).setInt32("n", n).build();
         return GenericRecordBuilder.compact(topClazz.getName()).setString("otherField", otherField)
                                    .setGenericRecord("wrapped", subRecord).build();
@@ -199,8 +194,5 @@ public class NestedReflectiveRestrictionTest {
         public int hashCode() {
             return Objects.hash(wrapped, otherField);
         }
-    }
-
-    public record TestRecordDto(MyInterface wrapped, String otherField) {
     }
 }
