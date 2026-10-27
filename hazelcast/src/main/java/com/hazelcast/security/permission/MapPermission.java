@@ -25,8 +25,8 @@ public class MapPermission extends InstancePermission {
     private static final int LOCK = 64;
     private static final int INDEX = 128;
     private static final int INTERCEPT = 256;
-    private static final int AGGREGATE = 1 << 9;
-    private static final int PROJECTION = 1 << 10;
+    private static final int AGGREGATE = 512;
+    private static final int PROJECTION = 1024;
     private static final int ALL = CREATE | DESTROY | PUT | REMOVE | READ | LISTEN
             | LOCK | INDEX | INTERCEPT | AGGREGATE | PROJECTION;
 
@@ -34,7 +34,7 @@ public class MapPermission extends InstancePermission {
         super(name, actions);
     }
 
-    @SuppressWarnings("checkstyle:CyclomaticComplexity")
+    @SuppressWarnings("checkstyle:cyclomaticcomplexity")
     @Override
     protected int initMask(String[] actions) {
         int mask = NONE;
